@@ -34,6 +34,36 @@ export const getOneProduct = async (request, response) => {
 export const createProduct = async (request, response) => {
     const product = request.body;
 
+    let images = []
+    if (typeof request.body.images === 'string') {
+        images.push(request.body.images)
+    } else {
+        images = request.body.images
+    }
+
+    let imagesLinks = [];
+    for (let i = 0; i < images.length; i++) {
+        try {
+            const result = await cloudinary.v2.uploader.upload(images[i], {
+                folder: 'courses',
+                width: 500,
+                height: 500,
+                crop: "scale",
+            });
+
+            imagesLinks.push({
+                public_id: result.public_id,
+                url: result.secure_url
+            })
+
+        } catch (error) {
+            console.log("Cant Upload", error)
+        }
+
+    }
+
+    request.body.images = imagesLinks
+
     if (!product.title || !product.description || !product.price ) {
         return response.status(400).json({ success: false, message: "Please provide all fields." });
     }
@@ -58,6 +88,7 @@ export const createProduct = async (request, response) => {
 
 export const updateProduct = async (request, response) => {
     const { id } = request.params;
+    
 
     let images = []
     if (Array.isArray(request.body.images)) {

@@ -8,8 +8,9 @@ import toast from 'react-hot-toast';
 export default function DataGridDemo() {
   const [rows, setRows] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [productData, setProductData] = useState({ title: '', description: '', price: '' });
+  const [productData, setProductData] = useState({ title: '', description: '', price: '', images: '' });
   const [editingProductId, setEditingProductId] = useState(null);
+  const [imagePreview, setImagesPreview] = useState([])
 
   const retrieve = async () => {
     try {
@@ -35,6 +36,26 @@ export default function DataGridDemo() {
       toast.error('Something went wrong! Could not create Product.')
     }
   };
+
+  const onChange = e => {
+    const files = Array.from(e.target.files)
+    const newImages = [];
+    setImagesPreview([]);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setImagesPreview(oldArray => [...oldArray, reader.result])
+          newImages.push(reader.result);
+        }
+      }
+      reader.readAsDataURL(file)
+    })
+    setProductData((prevState) => ({
+      ...prevState,
+      images: newImages,
+    }));
+  }
 
   const updateProduct = async () => {
     try {
@@ -157,6 +178,22 @@ export default function DataGridDemo() {
             onChange={handleInputChange}
             fullWidth
           />
+          <input type="file" onChange={onChange}
+            multiple />
+          <div className="images">
+            {
+              imagePreview.map((image, index) => (
+                <img className='img-preview' key={index} src={image} alt="Product Image" />
+              ))
+            }
+          </div>
+          <div className="images">
+            {
+              imagePreview.map((image, index) => (
+                <img className='img-preview' key={index} src={image} alt="Product Image" />
+              ))
+            }
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} color="secondary">
