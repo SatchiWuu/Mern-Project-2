@@ -9,13 +9,6 @@ import express from "express";
 export const getProduct = async (request, response) => {
     try {
         const product = await Product.find({})
-            .populate({
-                path: 'category',
-                populate: {
-                    path: 'clothing_type',
-                    model: 'Type'
-                }
-            })
             .sort({ createdAt: -1 })
             .exec();
         response.status(200).json({ success: true, message: "Product Retrieved.", data: product });

@@ -16,8 +16,11 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { getUser } from "../../utils/helper";
+import { useAuth } from '../../auth/AuthContext'
+import toast from 'react-hot-toast'
 
 export default function ProductDetails() {
+  const { isAuthenticated } = useAuth();
   const { id } = useParams(); // Get product ID from URL params
   const [product, setProduct] = useState(null); // State to hold product data
   const [isLoading, setIsLoading] = useState(false); // Loading state
@@ -62,26 +65,32 @@ export default function ProductDetails() {
 
   // Function to add the product to the cart
   const handleAddToCart = async () => {
-    try {
-      setIsLoading(true);
-      const formData = {
-        productId: id,
-        stockId: 5,
-        quantity: quantity,
-      };
-      const response = await axios.post(
-        `http://localhost:8000/api/user/addToCart/${email}`,
-        formData
-      );
-      console.log(response);
-      setSuccessMessage("Product added to cart successfully!");
-      setOpenSnackbar(true);
-    } catch (error) {
-      setError("Error adding product to cart");
-      console.log(error);
-    } finally {
-      setIsLoading(false);
+    if (isAuthenticated) {
+      try {
+        setIsLoading(true);
+        const formData = {
+          productId: id,
+          stockId: 5,
+          quantity: quantity,
+        };
+        const response = await axios.post(
+          `http://localhost:8000/api/user/addToCart/${email}`,
+          formData
+        );
+        console.log(response);
+        setSuccessMessage("Product added to cart successfully!");
+        toast.success("Success! Item has been added to cart.")
+        setOpenSnackbar(true);
+      } catch (error) {
+        setError("Error adding product to cart");
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      toast.error('Please log in first!')
     }
+
   };
 
   // Render loading, product details, or error messages

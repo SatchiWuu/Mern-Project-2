@@ -24,10 +24,7 @@ export const getUser = async (request, response) => {
 export const getOneUser = async (request, response) => {
   try {
     const { id } = request.params;
-    const user = await User.findById(id).populate({
-      path: "cart.productId",
-      model: "Product",
-    });
+    const user = await User.findById(id).populate("cart.productId");
     response
       .status(200)
       .json({ success: true, message: "User Retrieved.", data: user });

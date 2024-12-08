@@ -1,3 +1,6 @@
+import axios from "axios";
+import toast from 'react-hot-toast'
+
 export const authenticate = (data, next) => {
   if (window !== "undefined") {
     sessionStorage.setItem("token", JSON.stringify(data.token));
@@ -26,10 +29,15 @@ export const getUser = () => {
   }
 };
 
-export const logout = (next) => {
+export const logout = async() => {
+  await axios.get('http://localhost:8000/auth/logout')
   if (window !== "undefined") {
+    
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
   }
-  next();
+  toast.success('Logged Out.')
+  setTimeout(() => {
+    window.location.reload()
+  }, [800])
 };

@@ -5,6 +5,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Shared.css'
+import { MdOutlineAnalytics } from "react-icons/md";
 
 const NAVIGATION = [
   {
@@ -20,6 +21,11 @@ const NAVIGATION = [
     segment: 'admin/crud/product',
     title: 'Products',
     icon: <ShoppingCartIcon />,
+  },
+  {
+    segment: 'admin/chart',
+    title: 'Charts',
+    icon: <MdOutlineAnalytics />,
   },
 
   {

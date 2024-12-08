@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardMedia, Typography, Button, Stack, Grid, Divider } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext';
 
 const Cart = () => {
+  const { user } = useAuth() 
   const [cart, setCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -12,17 +14,14 @@ const Cart = () => {
 
   // Retrieve the cart data
   const retrieve = async () => {
-    try {
-      const res = await axios.get('http://localhost:8000/api/user'); // Adjust URL if necessary
-      const cartData = res.data.data[0].cart;
-      setCart(cartData);
+    let total = 0
+    setCart(user.cart)
 
-      // Calculate total price
-      const total = cartData.reduce((acc, item) => acc + item.quantity * item.productId.price, 0);
-      setTotalPrice(total);
-    } catch (e) {
-      console.error('Error fetching cart data', e);
-    }
+    user.cart.map((items) => {
+      total = total + (items.quantity * items.productId.price)
+    })
+    console.log(total)
+    setTotalCost(total)
   };
 
   useEffect(() => {
@@ -54,7 +53,7 @@ const Cart = () => {
                 <CardMedia
                   component="img"
                   height="140"
-                  image={item.productId.images.length > 0 ? item.productId.images[0].url : 'https://via.placeholder.com/150'}
+                  image={item.productId.images?.length > 0 ? item.productId.images[0].url : 'https://via.placeholder.com/150'}
                   alt={item.productId.title}
                 />
                 <CardContent>
@@ -84,7 +83,7 @@ const Cart = () => {
 
       {cart.length > 0 && (
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h5">Total: ${totalPrice.toFixed(2)}</Typography>
+          <Typography variant="h5">Total: ${totalCost.toFixed(2)}</Typography>
           <Button onClick={()=> {handleCheckout()}} variant="contained" color="primary">Checkout</Button>
         </Stack>
       )}

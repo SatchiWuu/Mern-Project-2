@@ -8,7 +8,7 @@ import { sendToken } from "../../utils/jwtToken.js";
 
 export const checkUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).populate('cart.productId');
 
     return res.status(200).json({
       success: true,

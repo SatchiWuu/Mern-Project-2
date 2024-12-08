@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import toast from 'react-hot-toast';
 
 export default function DataGridDemo() {
   const [rows, setRows] = useState([]);
@@ -28,9 +29,10 @@ export default function DataGridDemo() {
     try {
       await axios.post('http://localhost:8000/api/product', productData);
       setOpenDialog(false);
+      toast.success('Success! Product has been created.')
       retrieve();
     } catch (e) {
-      console.error(e);
+      toast.error('Something went wrong! Could not create Product.')
     }
   };
 
@@ -38,17 +40,20 @@ export default function DataGridDemo() {
     try {
       await axios.put(`http://localhost:8000/api/product/${editingProductId}`, productData);
       setOpenDialog(false);
+      toast.success('Success! Product has been updated.')
       retrieve();
     } catch (e) {
-      console.error(e);
+      toast.error('Soemthing went wrong! Could not update Product.')
     }
   };
 
   const deleteProduct = async (productId) => {
     try {
       await axios.delete(`http://localhost:8000/api/product/${productId}`);
+      toast.success("Successful! Product has been deleted.")
       retrieve();
     } catch (e) {
+      toast.error('Something went wrong! Could not delete product.')
       console.error(e);
     }
   };

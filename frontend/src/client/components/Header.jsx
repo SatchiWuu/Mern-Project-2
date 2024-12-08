@@ -17,15 +17,14 @@ import AdbIcon from "@mui/icons-material/Adb";
 import RollerSkatingIcon from "@mui/icons-material/RollerSkating";
 import { getUser, logout } from "../../utils/helper";
 
+import { useAuth } from "../../auth/AuthContext";
+
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Header() {
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const [user, setUser] = React.useState({});
-  React.useEffect(() => {
-    setUser(getUser());
-  }, [user]);
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -43,6 +42,8 @@ function Header() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  console.log(isAuthenticated)
 
   return (
     <AppBar position="static">
@@ -126,13 +127,20 @@ function Header() {
             >
               Cart
             </Button>
-            <Button
-              component={Link}
-              to="/profile" // Navigate to /cart page
-              sx={{ my: 2, color: "white", display: "block" }}
-            >
-              Profile
-            </Button>
+            {
+
+              isAuthenticated ? (
+                <Button
+                  component={Link}
+                  to="/profile" // Navigate to /cart page
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  Profile
+                </Button>
+              ) : (
+                null
+              )
+            }
           </Box>
           {!user ? (
             <Box sx={{ flexGrow: 0 }}>
@@ -142,8 +150,8 @@ function Header() {
                 </IconButton>
               </Tooltip> */}
               <Button
-              color="#000080"
-              // variant="outlined"
+                color="#000080"
+                // variant="outlined"
                 onClick={() => {
                   navigate("/login");
                 }}
