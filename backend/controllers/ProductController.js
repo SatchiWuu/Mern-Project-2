@@ -39,32 +39,35 @@ export const createProduct = async (request, response) => {
         images.push(request.body.images)
     } else {
         images = request.body.images
-    }
+        console.log(request.body)
 
-    let imagesLinks = [];
-    for (let i = 0; i < images.length; i++) {
-        try {
-            const result = await cloudinary.v2.uploader.upload(images[i], {
-                folder: 'courses',
-                width: 500,
-                height: 500,
-                crop: "scale",
-            });
+        let imagesLinks = [];
+        for (let i = 0; i < images.length; i++) {
+            try {
+                const result = await cloudinary.v2.uploader.upload(images[i], {
+                    folder: 'courses',
+                    width: 500,
+                    height: 500,
+                    crop: "scale",
+                });
 
-            imagesLinks.push({
-                public_id: result.public_id,
-                url: result.secure_url
-            })
+                imagesLinks.push({
+                    public_id: result.public_id,
+                    url: result.secure_url
+                })
 
-        } catch (error) {
-            console.log("Cant Upload", error)
+            } catch (error) {
+                console.log("Cant Upload", error)
+            }
+
         }
 
+        request.body.images = imagesLinks
     }
 
-    request.body.images = imagesLinks
 
-    if (!product.title || !product.description || !product.price ) {
+
+    if (!product.title || !product.description || !product.price) {
         return response.status(400).json({ success: false, message: "Please provide all fields." });
     }
 
@@ -88,7 +91,7 @@ export const createProduct = async (request, response) => {
 
 export const updateProduct = async (request, response) => {
     const { id } = request.params;
-    
+
 
     let images = []
     if (Array.isArray(request.body.images)) {
@@ -116,7 +119,7 @@ export const updateProduct = async (request, response) => {
             }
             request.body.images = imagesLinks
         } else if (typeof request.body.images[0] === 'object') {
-            
+
         }
     } else if (typeof request.body.images === 'string') {
         images.push(request.body.images);
@@ -173,18 +176,18 @@ export const createStock = async (req, res) => {
         if (existingStock) {
 
             existingStock.quantity = quantity;
-            await product.save(); 
+            await product.save();
 
             return res.status(200).json({ message: "Stock quantity updated successfully", product });
         } else {
-          
+
             product.stock.push({
                 color,
                 size,
                 quantity,
             });
 
-            await product.save(); 
+            await product.save();
 
             return res.status(201).json({ message: "New stock created successfully", product });
         }
@@ -195,19 +198,19 @@ export const createStock = async (req, res) => {
 
 
 export const deductStock = async (req, res) => {
-    const { deductions } = req.body;  
+    const { deductions } = req.body;
 
     try {
-       
+
         for (const { productId, stockId, deductQuantity } of deductions) {
             const product = await Product.findById(productId);
-            
+
             if (!product) {
                 return res.status(404).json({ message: `Product with ID ${productId} not found` });
             }
 
             const stock = product.stock.id(stockId);
-            
+
             if (!stock) {
                 return res.status(404).json({ message: `Stock with ID ${stockId} not found for Product ID ${productId}` });
             }
@@ -216,8 +219,8 @@ export const deductStock = async (req, res) => {
                 return res.status(400).json({ message: `Insufficient stock quantity for Stock ID ${stockId} in Product ID ${productId}` });
             }
 
-            stock.quantity -= deductQuantity;  
-            await product.save();  
+            stock.quantity -= deductQuantity;
+            await product.save();
         }
 
         res.status(200).json({ message: "All stock deductions processed successfully" });
@@ -226,16 +229,16 @@ export const deductStock = async (req, res) => {
     }
 };
 
-export const deleteStock = async(req, res) => {
+export const deleteStock = async (req, res) => {
     const { productId, stockId } = req.body;
 
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
             productId,
             {
-                $pull: { stock: { _id: stockId } }  
+                $pull: { stock: { _id: stockId } }
             },
-            { new: true }  
+            { new: true }
         );
 
         if (!updatedProduct) {
@@ -243,18 +246,18 @@ export const deleteStock = async(req, res) => {
         }
 
         res.status(200).json({ message: "Stock deleted successfully", product: updatedProduct });
-    } catch(error) {
+    } catch (error) {
         res.status(500).json({ message: "Error in deleting stock", error })
     }
 }
 
-export const checkUserOrders = async(req, res) => {
+export const checkUserOrders = async (req, res) => {
     try {
         const { userId, productId } = req.params
         const { review, rating } = req.body
         const reviewData = {
             userId,
-            rating, 
+            rating,
             review
         };
 
@@ -265,18 +268,18 @@ export const checkUserOrders = async(req, res) => {
 
         user.checkout.map((order) => {
             order.order.items.map((item) => {
-                if(item.productId == productId) {
+                if (item.productId == productId) {
                     userHasProduct = true
                 }
             })
         })
 
         if (!userHasProduct) {
-            return res.status(200).json({ success: false, message:"User has not purchased this product.", userHasProduct })
+            return res.status(200).json({ success: false, message: "User has not purchased this product.", userHasProduct })
         }
 
-        return res.status(200).json({ success: true, message:"User has purchased this product.", userHasProduct })
-    } catch(error) {
+        return res.status(200).json({ success: true, message: "User has purchased this product.", userHasProduct })
+    } catch (error) {
         return res.status(500).json({ message: "Error in checking user orders", error })
     }
 }
@@ -310,13 +313,13 @@ export const checkIfReviewed = async (req, res) => {
         });
     }
 };
-export const addReview = async(req, res) => {
+export const addReview = async (req, res) => {
     try {
         const { userId, productId } = req.params
         const { review, rating } = req.body
         const reviewData = {
             userId,
-            rating, 
+            rating,
             review
         };
 
@@ -327,40 +330,40 @@ export const addReview = async(req, res) => {
 
         user.checkout.map((order) => {
             order.order.items.map((item) => {
-                if(item.productId == productId) {
+                if (item.productId == productId) {
                     userHasProduct = true
                 }
             })
         })
 
         if (!userHasProduct) {
-            return res.status(404).json({ message:"User has not purchased this product.", userHasProduct })
+            return res.status(404).json({ message: "User has not purchased this product.", userHasProduct })
         }
 
         product.reviews.map((review) => {
-            if(review.userId == userId) {
-                return res.status(404).json({ message:"User has already reviewed this product." })
+            if (review.userId == userId) {
+                return res.status(404).json({ message: "User has already reviewed this product." })
             }
         })
 
         product.reviews.push(reviewData);
         await product.save();
 
-        return res.status(200).json({ message:"Successfully added Review.", product })
+        return res.status(200).json({ message: "Successfully added Review.", product })
 
-    } catch(error) {
+    } catch (error) {
         // console.log("Error adding review", e)
         res.status(500).json({ message: "Error in adding Review", error })
     }
 }
 
-export const updateReview = async(req, res) => {
+export const updateReview = async (req, res) => {
     try {
         const { userId, productId } = req.params
         const { review, rating } = req.body
         const reviewData = {
             userId,
-            rating, 
+            rating,
             review
         };
 
@@ -369,21 +372,21 @@ export const updateReview = async(req, res) => {
         let reviewFound = false
         const product = await Product.findById(productId)
         product.reviews.map((review) => {
-            if(review.userId == userId) {
+            if (review.userId == userId) {
                 review.review = newReview
                 review.rating = rating
                 reviewFound = true
             }
         })
 
-        if(reviewFound) {
+        if (reviewFound) {
             await product.save()
-            return res.status(200).json({ message:"Successfully updated Review.", product })
+            return res.status(200).json({ message: "Successfully updated Review.", product })
         } else {
-            return res.status(404).json({ message:"No Review Found." })
+            return res.status(404).json({ message: "No Review Found." })
         }
 
-    } catch(error) {
+    } catch (error) {
         res.status(500).json({ message: "Error in updating Review", error })
     }
 }
@@ -408,7 +411,7 @@ export const deleteReview = async (req, res) => {
         await product.save();
 
         return res.status(200).json({ message: "Review successfully deleted.", product });
-        
+
     } catch (error) {
         return res.status(500).json({ message: "Error in deleting Review", error });
     }

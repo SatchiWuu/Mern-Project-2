@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 export default function DataGridDemo() {
   const [rows, setRows] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [productData, setProductData] = useState({ title: '', description: '', price: '', images: '' });
+  const [productData, setProductData] = useState({ title: '', description: '', price: '', images: [] });
   const [editingProductId, setEditingProductId] = useState(null);
   const [imagePreview, setImagesPreview] = useState([])
 
@@ -84,6 +84,7 @@ export default function DataGridDemo() {
       title: product?.title || '',
       description: product?.description || '',
       price: product?.price || '',
+      images: []
     });
     setEditingProductId(product?._id || null);
     setOpenDialog(true);
