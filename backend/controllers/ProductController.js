@@ -8,9 +8,22 @@ import express from "express";
 
 export const getProduct = async (request, response) => {
     try {
-        const product = await Product.find({})
-            .sort({ createdAt: -1 })
-            .exec();
+        const { minPrice, maxPrice, category, search } = request.query;
+
+        const query = {};
+    
+        // Add price range filter
+        if (minPrice || maxPrice) {
+          query.price = {};
+          if (minPrice) query.price.$gte = parseFloat(minPrice);
+          if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+        }
+    
+        // Add category filter
+        if (category) {
+          query.category = category;
+        }
+        const product = await Product.find(query)
         response.status(200).json({ success: true, message: "Product Retrieved.", data: product });
     } catch (error) {
         console.log("Error in fetching products: ", error.message);

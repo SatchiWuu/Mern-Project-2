@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 export default function DataGridDemo() {
   const [rows, setRows] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [productData, setProductData] = useState({ title: '', description: '', price: '', images: [] });
+  const [productData, setProductData] = useState({ title: '', description: '', price: '', images: [], category: '' });
   const [editingProductId, setEditingProductId] = useState(null);
   const [imagePreview, setImagesPreview] = useState([])
 
@@ -84,7 +84,7 @@ export default function DataGridDemo() {
       title: product?.title || '',
       description: product?.description || '',
       price: product?.price || '',
-      images: []
+      images: [], category: ''
     });
     setEditingProductId(product?._id || null);
     setOpenDialog(true);
@@ -97,6 +97,10 @@ export default function DataGridDemo() {
       [name]: value,
     }));
   };
+
+  useEffect(() => {
+    console.log(productData)
+  }, [productData])
 
   const columns = [
     { field: '_id', headerName: 'ID', width: 200 },
@@ -179,6 +183,13 @@ export default function DataGridDemo() {
             onChange={handleInputChange}
             fullWidth
           />
+          <select name="category" id="category" value={productData.category}
+            onChange={handleInputChange} style={{ width: '100%' }}>
+            <option value="Sneakers">Sneakers</option>
+            <option value="Loafers">Loafers</option>
+            <option value="Running Shoes">Running Shoes</option>
+            <option value="Boots">Boots</option>
+          </select>
           <input type="file" onChange={onChange}
             multiple />
           <div className="images">

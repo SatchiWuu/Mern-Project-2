@@ -6,62 +6,85 @@ import '../../App.css'
 
 const Welcome = () => {
   const [products, setProducts] = useState([]);
+  const [category, setCategory] = useState("");
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState({})
+
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000);
 
   const retrieve = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/product');
+      const res = await axios.get('http://localhost:8000/api/product', {
+        params: filters, // Send filters as query parameters
+      });
       setProducts(res.data.data);
     } catch (error) {
       console.error(error);
     }
   };
 
+  const updateFilters = () => {
+    setFilters({ maxPrice, minPrice, category })
+  }
+
+  useEffect(() => {
+    updateFilters()
+  }, [minPrice, maxPrice, category])
+
+  useEffect(() => {
+    console.log(filters)
+    retrieve();
+  }, [filters]);
+
   useEffect(() => {
     retrieve();
   }, []);
 
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000);
-
-  const handleFilter = () => {
-    onFilter({ min: minPrice, max: maxPrice });
-  };
 
   return (
     <div className='main-page'>
       <Box sx={{ padding: 2 }}>
         <div className='filters'>
-          <select name="" id="" style={{width: '100%'}}>
+          <select
+            name="category"
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            style={{ width: "100%" }}
+          >
             <option value="Sneakers">Sneakers</option>
-            <option value="Sneakers">Loafers</option>
-            <option value="Sneakers">Running Shoes</option>
-            <option value="Sneakers">Boots</option>
+            <option value="Loafers">Loafers</option>
+            <option value="Running Shoes">Running Shoes</option>
+            <option value="Boots">Boots</option>
           </select>
 
           <div style={{ marginTop: '30px' }}>
-        <label>Min Price: ${minPrice}</label>
-        <input
-          type="range"
-          min="0"
-          max="1000"
-          step="10"
-          value={minPrice}
-          onChange={(e) => setMinPrice(Number(e.target.value))}
-          style={{ width: "100%" }}
-        />
-      </div>
-      <div>
-        <label>Max Price: ${maxPrice}</label>
-        <input
-          type="range"
-          min="0"
-          max="1000"
-          step="10"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(Number(e.target.value))}
-          style={{ width: "100%" }}
-        />
-      </div>
+            <label>Min Price: ${minPrice}</label>
+            <input
+              type="range"
+              name='minPrice'
+              min="0"
+              max="1000"
+              step="10"
+              value={minPrice}
+              onChange={(e) => setMinPrice(Number(e.target.value))}
+              style={{ width: "100%" }}
+            />
+          </div>
+          <div>
+            <label>Max Price: ${maxPrice}</label>
+            <input
+              type="range"
+              name='maxPrice'
+              min="0"
+              max="1000"
+              step="10"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              style={{ width: "100%" }}
+            />
+          </div>
         </div>
       </Box>
       <Box sx={{ padding: 2 }}>

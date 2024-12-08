@@ -9,14 +9,11 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    category: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Category',
-            default: '6736f700d1f80ebb08ce5d26',
-            required: true
-        }
-    ],
+    category: {
+        type: String,
+        required: false,
+        default: 'Shoes'
+    },
     price: {
         type: Number,
         required: true,
